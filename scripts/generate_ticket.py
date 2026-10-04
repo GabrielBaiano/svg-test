@@ -1,51 +1,250 @@
 #!/usr/bin/env python3
 """
 Vintage Cinema Ticket Generator & Slicer for GitHub Profile READMEs
-Inspired by "A Rainy Day in New York (2019)" vintage ticket stub.
-
-Generates:
-1. Full monolithic SVGs (Original & Profile editions)
-2. High-framerate animated rain GIFs with transparent outer background
-3. 5 zero-gap modular slices engineered for GitHub READMEs with distinct hyperlinks
-4. Interactive preview HTML & GitHub Actions workflow
+Features:
+1. Dynamic Anime Motion Graphics (Manga ink character with counter-rotating spiral eyes,
+   floating DEPPAQ mascot, breathing float, and cursed energy ink sparks)
+2. Daily rotating literary quotes in English (Frankenstein, Dune, The Myth of Sisyphus,
+   The Lord of the Rings, Dante's Inferno, Machado de Assis)
+3. Clean modern minimalist stats grid without divider lines
+4. Zero-gap modular 6-slice architecture for GitHub Profile READMEs
+5. Standalone vector SVGs and animated GIFs
 """
 
 import os
 import sys
 import argparse
 import subprocess
+import datetime
+import math
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageOps, ImageDraw, ImageFilter
 import cairo
 import xml.etree.ElementTree as ET
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+DATA_DIR = os.path.join(ASSETS_DIR, "data")
 SLICES_DIR = os.path.join(ASSETS_DIR, "slices")
 BRAIN_DIR = "/home/gabrielgama/.gemini/antigravity/brain/18274c70-147f-4d8e-8e07-94567acbcf60"
 
-# Dimensions
+# Ticket Canvas Dimensions
 WIDTH = 394
 HEIGHT = 705
 
-# Slice boundaries
-# Slice 1: Artwork & Top Perforation (0 to 365, height 365)
-# Slice 2: Header & Title (365 to 415, height 50)
-# Slice 3: Social & Developer Info (415 to 478, height 63)
-# Slice 4: Stats Grid & Side Admission Notches (478 to 572, height 94)
-# Slice 5: Handwritten Note & Bottom Perforation (572 to 705, height 133)
-SLICE_BOUNDS = [
-    (1, 0, 365),
-    (2, 365, 50),
-    (3, 415, 63),
-    (4, 478, 94),
-    (5, 572, 133),
+# 18 Curated English Literary Quotes from Requested Classics
+# (Frankenstein, Dune, The Myth of Sisyphus, The Lord of the Rings, Dante's Inferno, Machado de Assis)
+BOOK_QUOTES = [
+    {
+        "id": "dune-fear",
+        "book": "Dune",
+        "author": "Frank Herbert",
+        "lines": [
+            "I must not fear. Fear is the mind-killer.",
+            "Fear is the little-death that brings obliteration.",
+            "Where the fear has gone there will be nothing."
+        ],
+        "attr": "— Frank Herbert, Dune"
+    },
+    {
+        "id": "frank-fearless",
+        "book": "Frankenstein",
+        "author": "Mary Shelley",
+        "lines": [
+            "Beware; for I am fearless,",
+            "and therefore powerful.",
+            "I will glut the maw of death until it be satiated."
+        ],
+        "attr": "— Mary Shelley, Frankenstein"
+    },
+    {
+        "id": "sisyphus-happy",
+        "book": "The Myth of Sisyphus",
+        "author": "Albert Camus",
+        "lines": [
+            "The struggle itself toward the heights",
+            "is enough to fill a man's heart.",
+            "One must imagine Sisyphus happy."
+        ],
+        "attr": "— Albert Camus, The Myth of Sisyphus"
+    },
+    {
+        "id": "lotr-gold",
+        "book": "The Lord of the Rings",
+        "author": "J.R.R. Tolkien",
+        "lines": [
+            "All that is gold does not glitter,",
+            "Not all those who wander are lost;",
+            "The old that is strong does not wither."
+        ],
+        "attr": "— J.R.R. Tolkien, The Fellowship of the Ring"
+    },
+    {
+        "id": "inferno-hope",
+        "book": "Inferno",
+        "author": "Dante Alighieri",
+        "lines": [
+            "Through me the way into the suffering city,",
+            "Through me the way to the eternal pain.",
+            "Abandon all hope, ye who enter here."
+        ],
+        "attr": "— Dante Alighieri, Inferno"
+    },
+    {
+        "id": "machado-legacy",
+        "book": "The Posthumous Memoirs of Brás Cubas",
+        "author": "Machado de Assis",
+        "lines": [
+            "I had no children,",
+            "I transmitted to no one",
+            "the legacy of our misery."
+        ],
+        "attr": "— Machado de Assis, Brás Cubas"
+    },
+    {
+        "id": "dune-mystery",
+        "book": "Dune",
+        "author": "Frank Herbert",
+        "lines": [
+            "The mystery of life is not a problem to solve,",
+            "but a reality to experience."
+        ],
+        "attr": "— Frank Herbert, Dune"
+    },
+    {
+        "id": "frank-anguish",
+        "book": "Frankenstein",
+        "author": "Mary Shelley",
+        "lines": [
+            "Life, although it may only be an accumulation",
+            "of anguish, is dear to me, and I will defend it."
+        ],
+        "attr": "— Mary Shelley, Frankenstein"
+    },
+    {
+        "id": "sisyphus-shadow",
+        "book": "The Myth of Sisyphus",
+        "author": "Albert Camus",
+        "lines": [
+            "There is no sun without shadow,",
+            "and it is essential to know the night."
+        ],
+        "attr": "— Albert Camus, The Myth of Sisyphus"
+    },
+    {
+        "id": "lotr-fighting",
+        "book": "The Lord of the Rings",
+        "author": "J.R.R. Tolkien",
+        "lines": [
+            "There is some good in this world, Mr. Frodo,",
+            "and it's worth fighting for."
+        ],
+        "attr": "— J.R.R. Tolkien, The Two Towers"
+    },
+    {
+        "id": "inferno-neutrality",
+        "book": "Inferno",
+        "author": "Dante Alighieri",
+        "lines": [
+            "The darkest places in hell are reserved for those",
+            "who maintain neutrality in times of moral crisis."
+        ],
+        "attr": "— Dante Alighieri, Inferno"
+    },
+    {
+        "id": "machado-slate",
+        "book": "Dom Casmurro",
+        "author": "Machado de Assis",
+        "lines": [
+            "To forget is a necessity. Life is a slate,",
+            "in which fate needs to erase the written."
+        ],
+        "attr": "— Machado de Assis, Dom Casmurro"
+    },
+    {
+        "id": "dune-universe",
+        "book": "Dune",
+        "author": "Frank Herbert",
+        "lines": [
+            "Deep in the human unconscious is a pervasive need",
+            "for a logical universe that makes sense."
+        ],
+        "attr": "— Frank Herbert, Dune"
+    },
+    {
+        "id": "frank-change",
+        "book": "Frankenstein",
+        "author": "Mary Shelley",
+        "lines": [
+            "Nothing is so painful to the human mind",
+            "as a great and sudden change."
+        ],
+        "attr": "— Mary Shelley, Frankenstein"
+    },
+    {
+        "id": "sisyphus-summer",
+        "book": "The Myth of Sisyphus",
+        "author": "Albert Camus",
+        "lines": [
+            "In the midst of winter, I found there was,",
+            "within me, an invincible summer."
+        ],
+        "attr": "— Albert Camus, The Myth of Sisyphus"
+    },
+    {
+        "id": "lotr-smallest",
+        "book": "The Lord of the Rings",
+        "author": "J.R.R. Tolkien",
+        "lines": [
+            "Even the smallest person can change",
+            "the course of the future."
+        ],
+        "attr": "— J.R.R. Tolkien, The Fellowship of the Ring"
+    },
+    {
+        "id": "inferno-stars",
+        "book": "Inferno",
+        "author": "Dante Alighieri",
+        "lines": [
+            "And thence we came forth",
+            "to see again the stars."
+        ],
+        "attr": "— Dante Alighieri, Inferno"
+    },
+    {
+        "id": "machado-irony",
+        "book": "Philosopher or Dog?",
+        "author": "Machado de Assis",
+        "lines": [
+            "The irony of life is that we look for happiness",
+            "far away, when it is woven from everyday threads."
+        ],
+        "attr": "— Machado de Assis, Philosopher or Dog?"
+    }
 ]
 
+def get_daily_quote(day_index=None, quote_id=None):
+    """Selects quote based on explicit ID, day index, or day of the year."""
+    if quote_id:
+        for q in BOOK_QUOTES:
+            if q["id"] == quote_id:
+                return q
+    if day_index is not None:
+        return BOOK_QUOTES[day_index % len(BOOK_QUOTES)]
+    day_of_year = datetime.datetime.now().timetuple().tm_yday
+    return BOOK_QUOTES[(day_of_year - 1) % len(BOOK_QUOTES)]
+
 def load_path_file(filename):
-    path = os.path.join(BRAIN_DIR, filename)
-    with open(path, "r", encoding="utf-8") as f:
-        return f.read().strip()
+    """Loads SVG path from assets/data or fallback brain dir."""
+    local_path = os.path.join(DATA_DIR, filename)
+    if os.path.exists(local_path):
+        with open(local_path, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    brain_path = os.path.join(BRAIN_DIR, filename)
+    if os.path.exists(brain_path):
+        with open(brain_path, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    return ""
 
 def get_arrow_svg(x, y, size=11):
     return f"""<g transform="translate({x}, {y})">
@@ -68,7 +267,7 @@ def cairo_text_to_path(lines_spec, width, height):
     lines_spec: list of tuples: (x, y, text, font_family, font_size, is_bold)
     returns SVG path string containing all text as vector curves.
     """
-    temp_svg = os.path.join(BRAIN_DIR, "_temp_cairo.svg")
+    temp_svg = os.path.join(ASSETS_DIR, "_temp_cairo.svg")
     surf = cairo.SVGSurface(temp_svg, width, height)
     ctx = cairo.Context(surf)
     
@@ -91,196 +290,255 @@ def cairo_text_to_path(lines_spec, width, height):
         os.remove(temp_svg)
     return " ".join(paths)
 
+def render_quote_to_path(quote_obj):
+    """Renders literary quote in Caveat cursive to SVG vector path."""
+    lines = quote_obj["lines"]
+    attr = quote_obj["attr"]
+    n_lines = len(lines)
+    
+    if n_lines == 3:
+        start_y = 22
+        lh = 19
+        font_size = 16.0
+    elif n_lines == 2:
+        start_y = 28
+        lh = 22
+        font_size = 16.5
+    else:
+        start_y = 35
+        lh = 24
+        font_size = 17.0
+        
+    spec = []
+    for i, line in enumerate(lines):
+        spec.append((32, start_y + i * lh, line, "Caveat", font_size, True))
+    attr_y = start_y + n_lines * lh + 2
+    spec.append((40, attr_y, attr, "Caveat", 13.5, True))
+    
+    return cairo_text_to_path(spec, WIDTH, 133)
+
+def draw_cursed_sparks(draw, origin, phase, num_sparks=2):
+    """Draws crackling ink sparks around hand seals."""
+    ox, oy = origin
+    np.random.seed(int(phase * 1000) % 9999)
+    for _ in range(num_sparks):
+        angle = np.random.uniform(0, 2 * math.pi)
+        dist = np.random.uniform(8, 24)
+        curr = (ox, oy)
+        points = [curr]
+        for s in range(3):
+            step = dist / 3
+            nx = curr[0] + step * math.cos(angle) + np.random.uniform(-3, 3)
+            ny = curr[1] + step * math.sin(angle) + np.random.uniform(-3, 3)
+            points.append((nx, ny))
+            curr = (nx, ny)
+        for i in range(len(points) - 1):
+            w = 2.0 if i == 0 else 1.2
+            draw.line([points[i], points[i+1]], fill=(17, 17, 17, 240), width=int(w))
+
+
 class TicketGenerator:
     def __init__(self):
         self.d_ticket = load_path_file("ticket_perimeter_path.txt")
         self.d_art = load_path_file("art_ink_path.txt")
-        self.d_quote = load_path_file("quote_clean_path.txt")
+        self.d_quote_orig = load_path_file("quote_clean_path.txt")
         os.makedirs(ASSETS_DIR, exist_ok=True)
+        os.makedirs(DATA_DIR, exist_ok=True)
         os.makedirs(SLICES_DIR, exist_ok=True)
         os.makedirs(os.path.join(SLICES_DIR, "original"), exist_ok=True)
         os.makedirs(os.path.join(SLICES_DIR, "profile"), exist_ok=True)
 
-    def render_art_base_png(self):
-        """Renders static Slice 1 base SVG to crisp PNG with transparent background."""
-        base_svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} 365" width="{WIDTH}" height="365">
-  <defs>
-    <clipPath id="t-clip-1"><path d="{self.d_ticket}" /></clipPath>
-  </defs>
-  <!-- Ticket body (vintage off-white paper) -->
-  <path d="{self.d_ticket}" fill="#efeee9" />
-  <g clip-path="url(#t-clip-1)">
-    <path d="{self.d_art}" fill="#111111" fill-rule="evenodd" />
-  </g>
-</svg>"""
-        base_svg_path = os.path.join(BRAIN_DIR, "slice_1_base.svg")
-        with open(base_svg_path, "w", encoding="utf-8") as f:
-            f.write(base_svg)
+    def generate_character_motion_gif(self, output_gif_path, full_ticket=False, profile_data=None, quote_obj=None):
+        """
+        Synthesizes a 24-frame seamless looping manga motion animation.
+        - Hypnotic counter-rotating spiral eyes
+        - Floating DEPPAQ mascot with subtle tilt
+        - Character breathing bob
+        - Crackling cursed energy ink sparks
+        - Alpha masked to scalloped ticket perforations
+        """
+        sketch_path = os.path.join(ASSETS_DIR, "character_sketch.png")
+        if not os.path.exists(sketch_path):
+            raise FileNotFoundError(f"Missing character sketch asset: {sketch_path}")
             
-        base_png_path = os.path.join(BRAIN_DIR, "slice_1_base.png")
-        cmd = [
-            "google-chrome",
-            "--headless",
-            f"--screenshot={base_png_path}",
-            f"--window-size={WIDTH},365",
-            "--default-background-color=00000000",
-            f"file://{base_svg_path}"
-        ]
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return base_png_path
+        print(f"Generating Anime Motion Graphic -> {os.path.basename(output_gif_path)}...")
+        im_orig = Image.open(sketch_path).convert("RGBA")
+        w_orig, h_orig = im_orig.size
 
-    def generate_animated_rain_gif(self, output_gif_path, full_ticket=False, profile_data=None):
-        """
-        Synthesizes a 24-frame seamless looping rain animation.
-        Raindrops fall diagonally with authentic linocut ink streaks,
-        respecting umbrella and character occlusion.
-        """
-        print(f"Generating animated rain GIF -> {os.path.basename(output_gif_path)}...")
-        
-        # Determine base render
-        if not full_ticket:
-            base_png = self.render_art_base_png()
-            base_img = Image.open(base_png).convert("RGBA")
-            h_canvas = 365
-            y_min, y_max = 25, 365
-        else:
-            full_svg_path = os.path.join(BRAIN_DIR, "_full_ticket_base.svg")
-            edition = "profile" if profile_data else "original"
-            full_svg_content = self.build_full_svg(edition, profile_data)
-            with open(full_svg_path, "w", encoding="utf-8") as f:
-                f.write(full_svg_content)
-            base_png = os.path.join(BRAIN_DIR, "_full_ticket_base.png")
-            cmd = [
-                "google-chrome",
-                "--headless",
-                f"--screenshot={base_png}",
+        # Extract ink channel
+        gray = ImageOps.grayscale(im_orig)
+        ink_arr = 255 - np.array(gray)
+        alpha = np.clip(ink_arr.astype(float) * 1.35, 0, 255).astype(np.uint8)
+
+        ink_full = np.zeros((h_orig, w_orig, 4), dtype=np.uint8)
+        ink_full[:, :, 0] = 17
+        ink_full[:, :, 1] = 17
+        ink_full[:, :, 2] = 17
+        ink_full[:, :, 3] = alpha
+        ink_img = Image.fromarray(ink_full)
+
+        # Isolated spiral pupils
+        PUPIL_L = (413, 301)
+        PUPIL_R = (546, 304)
+        R_PUPIL = 15
+
+        def extract_feathered_patch(img, cx, cy, r):
+            patch = img.crop((cx - r, cy - r, cx + r, cy + r))
+            mask = Image.new("L", (2*r, 2*r), 0)
+            draw = ImageDraw.Draw(mask)
+            draw.ellipse((1, 1, 2*r - 2, 2*r - 2), fill=255)
+            mask = mask.filter(ImageFilter.GaussianBlur(radius=0.8))
+            patch.putalpha(Image.fromarray(np.minimum(np.array(patch.split()[3]), np.array(mask))))
+            return patch
+
+        pupil_l = extract_feathered_patch(ink_img, PUPIL_L[0], PUPIL_L[1], R_PUPIL)
+        pupil_r = extract_feathered_patch(ink_img, PUPIL_R[0], PUPIL_R[1], R_PUPIL)
+
+        # Clear pupil area on base character
+        base_char = ink_img.copy()
+        erase_mask = Image.new("L", (w_orig, h_orig), 0)
+        draw_e = ImageDraw.Draw(erase_mask)
+        draw_e.ellipse((PUPIL_L[0] - R_PUPIL + 1, PUPIL_L[1] - R_PUPIL + 1, PUPIL_L[0] + R_PUPIL - 1, PUPIL_L[1] + R_PUPIL - 1), fill=255)
+        draw_e.ellipse((PUPIL_R[0] - R_PUPIL + 1, PUPIL_R[1] - R_PUPIL + 1, PUPIL_R[0] + R_PUPIL - 1, PUPIL_R[1] + R_PUPIL - 1), fill=255)
+        erase_mask = erase_mask.filter(ImageFilter.GaussianBlur(radius=0.5))
+
+        b_arr = np.array(base_char)
+        b_alpha = b_arr[:, :, 3].astype(float)
+        e_alpha = np.array(erase_mask).astype(float) / 255.0
+        b_arr[:, :, 3] = np.clip(b_alpha * (1.0 - e_alpha), 0, 255).astype(np.uint8)
+
+        # Extract DEPPAQ mascot
+        deppaq_box = (680, 150, 860, 280)
+        deppaq = ink_img.crop(deppaq_box)
+        b_arr[150:280, 680:860, 3] = 0
+        base_char_clean = Image.fromarray(b_arr)
+
+        # Ticket paper base
+        paper_path = os.path.join(ASSETS_DIR, "ticket_paper_slice1.png")
+        if not os.path.exists(paper_path):
+            raise FileNotFoundError(f"Missing paper base: {paper_path}")
+        paper_base = Image.open(paper_path).convert("RGBA")
+        paper_mask = paper_base.split()[3]
+
+        # Target dimensions
+        scale = 322 / w_orig
+        char_w = 322
+        char_h = int(h_orig * scale)
+
+        NUM_FRAMES = 24
+        frames = []
+
+        # If rendering full ticket GIF, prepare static background of slices 2..6
+        if full_ticket:
+            full_static_svg = self.build_full_svg(edition="profile", profile_data=profile_data, quote_obj=quote_obj, include_art=False)
+            tmp_svg = os.path.join(ASSETS_DIR, "_full_static.svg")
+            tmp_png = os.path.join(ASSETS_DIR, "_full_static.png")
+            with open(tmp_svg, "w", encoding="utf-8") as f:
+                f.write(full_static_svg)
+            subprocess.run([
+                "google-chrome", "--headless",
+                f"--screenshot={tmp_png}",
                 f"--window-size={WIDTH},{HEIGHT}",
                 "--default-background-color=00000000",
-                f"file://{full_svg_path}"
-            ]
-            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            base_img = Image.open(base_png).convert("RGBA")
-            h_canvas = HEIGHT
-            y_min, y_max = 25, 365
+                f"file://{tmp_svg}"
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            full_base_img = Image.open(tmp_png).convert("RGBA")
+            if os.path.exists(tmp_svg):
+                os.remove(tmp_svg)
+            if os.path.exists(tmp_png):
+                os.remove(tmp_png)
 
-        num_frames = 24
-        fps = 24
-        slant = 0.16
-        travel_h = y_max - y_min
-
-        np.random.seed(42)
-        drops = []
-
-        # Layer 1: Fine background drizzle (35 drops)
-        for _ in range(35):
-            cycles = np.random.choice([1, 2])
-            speed = cycles * travel_h / num_frames
-            drops.append({
-                "x": np.random.uniform(25, 335),
-                "y0": np.random.uniform(0, travel_h),
-                "len": np.random.uniform(8, 14),
-                "speed": speed,
-                "width": 1,
-                "color": (25, 25, 28, 140)
-            })
-
-        # Layer 2: Main linocut rain streaks (45 drops)
-        for _ in range(45):
-            cycles = np.random.choice([2, 3])
-            speed = cycles * travel_h / num_frames
-            drops.append({
-                "x": np.random.uniform(25, 335),
-                "y0": np.random.uniform(0, travel_h),
-                "len": np.random.uniform(14, 22),
-                "speed": speed,
-                "width": 2,
-                "color": (15, 15, 18, 220)
-            })
-
-        # Layer 3: Heavy fast drops (12 drops)
-        for _ in range(12):
-            cycles = np.random.choice([3, 4])
-            speed = cycles * travel_h / num_frames
-            drops.append({
-                "x": np.random.uniform(25, 335),
-                "y0": np.random.uniform(0, travel_h),
-                "len": np.random.uniform(22, 30),
-                "speed": speed,
-                "width": 2,
-                "color": (10, 10, 12, 255)
-            })
-
-        frames_dir = os.path.join(BRAIN_DIR, f"gif_frames_{'full' if full_ticket else 'art'}")
+        frames_dir = os.path.join(ASSETS_DIR, f"_frames_{'full' if full_ticket else 'slice1'}")
         os.makedirs(frames_dir, exist_ok=True)
-        base_alpha = np.array(base_img)[:, :, 3] > 80
 
-        for f in range(num_frames):
-            overlay = Image.new("RGBA", (WIDTH, h_canvas), (0, 0, 0, 0))
-            draw = ImageDraw.Draw(overlay)
+        for f in range(NUM_FRAMES):
+            t = f / NUM_FRAMES
+            rad = t * 2 * math.pi
 
-            for d in drops:
-                curr_y = (d["y0"] + f * d["speed"]) % travel_h + y_min
-                curr_x = d["x"] + (curr_y - y_min) * slant
+            # Breathing float
+            body_dy = 2.0 * math.sin(rad)
+            body_scale = 1.0 + 0.007 * math.sin(rad)
+            cur_w = int(char_w * body_scale)
+            cur_h = int(char_h * body_scale)
 
-                # Umbrella dome occlusion
-                dx = (curr_x - 212) / 98.0
-                dy = (curr_y - 142) / 52.0
-                if dx*dx + dy*dy < 0.95 and curr_y < 162:
-                    continue
+            # Counter-rotating spiral pupils
+            rot_deg = t * 360
+            rot_pl = pupil_l.rotate(rot_deg, resample=Image.Resampling.BICUBIC)
+            rot_pr = pupil_r.rotate(-rot_deg, resample=Image.Resampling.BICUBIC)
 
-                # Character body & face occlusion
-                if 165 < curr_x < 245 and 160 < curr_y < 340:
-                    continue
+            # Reassemble character
+            full_char = base_char_clean.copy()
+            full_char.alpha_composite(rot_pl, (PUPIL_L[0] - R_PUPIL, PUPIL_L[1] - R_PUPIL))
+            full_char.alpha_composite(rot_pr, (PUPIL_R[0] - R_PUPIL, PUPIL_R[1] - R_PUPIL))
 
-                x_end = curr_x + d["len"] * slant
-                y_end = curr_y + d["len"]
-                draw.line([(curr_x, curr_y), (x_end, y_end)], fill=d["color"], width=d["width"])
+            scaled_char = full_char.resize((cur_w, cur_h), Image.Resampling.LANCZOS)
 
-            # Clip rain to ticket alpha silhouette
-            overlay_arr = np.array(overlay)
-            overlay_arr[~base_alpha] = 0
-            overlay_masked = Image.fromarray(overlay_arr)
+            # Canvas frame
+            frame = paper_base.copy()
+            char_x = 19 + (326 - cur_w) // 2
+            char_y = int(35 + body_dy)
+            frame.alpha_composite(scaled_char, (char_x, char_y))
 
-            composite = Image.alpha_composite(base_img, overlay_masked)
-            composite.save(os.path.join(frames_dir, f"frame_{f:03d}.png"))
+            # Floating DEPPAQ mascot
+            deppaq_dy = 3.8 * math.sin(rad + 1.4)
+            deppaq_rot = 3.0 * math.sin(rad)
+            dep_w = int(deppaq.width * scale)
+            dep_h = int(deppaq.height * scale)
+            dep_scaled = deppaq.resize((dep_w, dep_h), Image.Resampling.LANCZOS)
+            dep_rotated = dep_scaled.rotate(deppaq_rot, resample=Image.Resampling.BICUBIC)
 
-        # High-quality ffmpeg palette compilation with alpha preservation
+            dep_x = int(char_x + deppaq_box[0] * scale)
+            dep_y = int(char_y + deppaq_box[1] * scale + deppaq_dy)
+            frame.alpha_composite(dep_rotated, (dep_x, dep_y))
+
+            # Crackling cursed energy sparks
+            spark_img = Image.new("RGBA", (WIDTH, 365), (0, 0, 0, 0))
+            d_spark = ImageDraw.Draw(spark_img)
+            finger_pt = (char_x + int(276 * (cur_w / 322)), char_y + int(268 * (cur_h / char_h)))
+            draw_cursed_sparks(d_spark, finger_pt, t + 0.2, num_sparks=2)
+            chest_pt = (char_x + int(195 * (cur_w / 322)), char_y + int(195 * (cur_h / char_h)))
+            draw_cursed_sparks(d_spark, chest_pt, t + 0.7, num_sparks=1)
+            frame.alpha_composite(spark_img, (0, 0))
+
+            # Alpha mask with scalloped ticket teeth
+            r, g, b, a = frame.split()
+            final_a = Image.fromarray(np.minimum(np.array(a), np.array(paper_mask)))
+            frame.putalpha(final_a)
+
+            if full_ticket:
+                full_canvas = full_base_img.copy()
+                full_canvas.alpha_composite(frame, (0, 0))
+                full_canvas.save(os.path.join(frames_dir, f"frame_{f:03d}.png"))
+                frames.append(full_canvas)
+            else:
+                frame.save(os.path.join(frames_dir, f"frame_{f:03d}.png"))
+                frames.append(frame)
+
+        # High quality palette compilation with ffmpeg
         cmd = [
             "ffmpeg", "-y",
-            "-framerate", str(fps),
+            "-framerate", "22",
             "-i", os.path.join(frames_dir, "frame_%03d.png"),
             "-filter_complex", "[0:v] split [a][b];[a] palettegen=reserve_transparent=on:transparency_color=00000000 [p];[b][p] paletteuse=alpha_threshold=128",
             output_gif_path
         ]
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        # Cleanup frame directory
+        for f in os.listdir(frames_dir):
+            os.remove(os.path.join(frames_dir, f))
+        os.rmdir(frames_dir)
         print(f"  -> Generated {output_gif_path} ({os.path.getsize(output_gif_path):,} bytes)")
 
-    def build_slice_1_svg(self, animated=False):
-        """Generates Slice 1 SVG (Artwork & Top Scallop)."""
-        rain_smil = ""
-        if animated:
-            rain_smil = """
-    <g opacity="0.85">
-      <line x1="45" y1="40" x2="48" y2="60" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="85" y1="70" x2="88" y2="90" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="120" y1="50" x2="123" y2="70" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="280" y1="60" x2="283" y2="80" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="315" y1="90" x2="318" y2="110" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="60" y1="130" x2="63" y2="150" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="295" y1="160" x2="298" y2="180" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="110" y1="210" x2="113" y2="230" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="270" y1="240" x2="273" y2="260" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <animateTransform attributeName="transform" type="translate" from="0 -100" to="16 100" dur="0.8s" repeatCount="indefinite" />
-    </g>"""
-
+    def build_slice_1_svg(self):
+        """Slice 1 static vector fallback."""
         return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} 365" width="{WIDTH}" height="365">
   <defs>
     <clipPath id="t-clip-1"><path d="{self.d_ticket}" /></clipPath>
   </defs>
   <path d="{self.d_ticket}" fill="#efeee9" />
   <g clip-path="url(#t-clip-1)">
-    <path d="{self.d_art}" fill="#111111" fill-rule="evenodd" />
-    {rain_smil}
+    <image href="slice_01_art.gif" width="{WIDTH}" height="365" />
   </g>
 </svg>"""
 
@@ -323,7 +581,6 @@ class TicketGenerator:
             (274, 25, "VISIT", "Courier New", 11, True),
         ], WIDTH, 44)
         arrow = get_arrow_svg(316, 16, 10)
-        # Organic double pen stroke (like quick hand marking with ballpoint/fountain pen)
         pen_underline = '''
   <path d="M 32 32.0 C 58 31.2, 92 32.6, 122 31.4 C 135 30.9, 143 31.6, 150 31.0" 
         stroke="#111111" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9" />
@@ -339,7 +596,7 @@ class TicketGenerator:
 </svg>"""
 
     def build_slice_4_linkedin_svg(self):
-        """Slice 4: LinkedIn (height 44) - Clean, matching portfolio without dashed stamp box"""
+        """Slice 4: LinkedIn (height 44) - Clean, matching portfolio"""
         l_text = cairo_text_to_path([
             (34, 27, "LINKEDIN", "DejaVu Serif", 16.5, True),
             (264, 26, "CONNECT", "Courier New", 11, True),
@@ -353,7 +610,7 @@ class TicketGenerator:
 </svg>"""
 
     def build_slice_5_stats_svg(self, edition="profile", profile_data=None):
-        """Slice 5: Stats Grid & Circular Admission Notches (height 108, y: 464..572)"""
+        """Slice 5: Clean modern minimalist stats grid without divider lines (height 108, y: 464..572)"""
         if profile_data is None:
             profile_data = {}
         c_val = profile_data.get("commits", "+54 / wk")
@@ -384,21 +641,22 @@ class TicketGenerator:
     <g transform="translate(0, 464)">
       <path d="{text_d}" fill="#111111" />
     </g>
-    <!-- Column dividers in row 1 -->
-    <line x1="130" y1="496" x2="130" y2="522" stroke="#111111" stroke-width="1.1" stroke-dasharray="1 3" stroke-linecap="round" />
-    <line x1="236" y1="496" x2="236" y2="522" stroke="#111111" stroke-width="1.1" stroke-dasharray="1 3" stroke-linecap="round" />
-    <!-- Row divider -->
-    <line x1="34" y1="531" x2="330" y2="531" stroke="#111111" stroke-width="1.0" stroke-dasharray="2 3" stroke-linecap="round" opacity="0.6" />
-    <!-- Column divider in row 2 -->
-    <line x1="168" y1="537" x2="168" y2="563" stroke="#111111" stroke-width="1.1" stroke-dasharray="1 3" stroke-linecap="round" />
+    <!-- Clean layout: inner divider lines removed per design spec -->
     <!-- Bottom line -->
     <line x1="30" y1="571" x2="335" y2="571" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
   </g>
 </svg>"""
 
-    def build_slice_6_note_svg(self, edition="profile", profile_data=None):
-        """Slice 6: Handwritten Note & Bottom Scalloped Perforation (y: 572..705, height 133)"""
-        quote_content = f'<path d="{self.d_quote}" fill="#111111" fill-rule="evenodd" />'
+    def build_slice_6_note_svg(self, edition="profile", quote_obj=None):
+        """Slice 6: Handwritten Literary Note & Bottom Scalloped Perforation (y: 572..705, height 133)"""
+        if edition == "original":
+            quote_content = f'<path d="{self.d_quote_orig}" fill="#111111" fill-rule="evenodd" />'
+        else:
+            if quote_obj is None:
+                quote_obj = get_daily_quote()
+            quote_d = render_quote_to_path(quote_obj)
+            quote_content = f'<g transform="translate(0, 572)"><path d="{quote_d}" fill="#111111" /></g>'
+            
         return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 572 {WIDTH} 133" width="{WIDTH}" height="133">
   <defs>
     <clipPath id="t-clip-6"><path d="{self.d_ticket}" /></clipPath>
@@ -409,7 +667,7 @@ class TicketGenerator:
   </g>
 </svg>"""
 
-    def build_full_svg(self, edition="profile", profile_data=None, animated=False):
+    def build_full_svg(self, edition="profile", profile_data=None, quote_obj=None, include_art=True):
         """Builds full monolithic master SVG ticket."""
         umbrellas = f"{get_umbrella_svg(270, 392, 0.95)} {get_umbrella_svg(295, 392, 0.95)} {get_umbrella_svg(320, 392, 0.95)}"
         
@@ -435,12 +693,10 @@ class TicketGenerator:
                 (33, 79, "20/Jul/2025", "Courier New", 12, True),
                 (145, 79, "20:00 - 21:32", "Courier New", 12, True),
             ], WIDTH, 94)
+            q_elem = f'<path d="{self.d_quote_orig}" fill="#111111" fill-rule="evenodd" />'
         else:
             title = profile_data.get("title", "GABRIEL GAMA · 2026")
             subtitle = profile_data.get("subtitle", "Front-end Developer • Brazil")
-            role = profile_data.get("role", "〔BR〕Gabriel Gama · Front-end Developer")
-            stack = profile_data.get("stack", "React · TypeScript · UI Architecture · SVGs")
-            links = profile_data.get("links", "LinkedIn: /in/gabriel-gama · Portfolio: gabrielbaiano.vercel.app")
             c_val = profile_data.get("commits", "+54 / wk")
             s_val = profile_data.get("streak", "28 days")
             r_val = profile_data.get("rank", "Top 5%")
@@ -451,48 +707,52 @@ class TicketGenerator:
                 (32, 21, title, "Noto Serif CJK SC", 15.5, True),
                 (33, 37, subtitle, "Courier New", 10.5, True)
             ], WIDTH, 50)
-            t3 = cairo_text_to_path([
-                (32, 17, role, "Noto Serif CJK SC", 11, True),
-                (33, 31, stack, "Courier New", 9.5, True),
-                (32, 45, links, "Noto Serif CJK SC", 8.5, False)
-            ], WIDTH, 63)
-            t4 = cairo_text_to_path([
-                (34, 20, "COMMITS", "Fira Sans Condensed", 10.5, True),
-                (142, 20, "STREAK", "Fira Sans Condensed", 10.5, True),
-                (248, 20, "RANK", "Fira Sans Condensed", 10.5, True),
-                (34, 37, c_val, "Fira Mono", 13.5, True),
-                (142, 37, s_val, "Fira Mono", 13.5, True),
-                (248, 37, r_val, "Fira Mono", 13.5, True),
-                (34, 61, "LOCATION", "Fira Sans Condensed", 10.5, True),
-                (180, 61, "UPDATED", "Fira Sans Condensed", 10.5, True),
-                (34, 78, l_val, "Fira Mono", 13.5, True),
-                (180, 78, d_val, "Fira Mono", 13.5, True),
-            ], WIDTH, 94)
+            
+            p_text = cairo_text_to_path([
+                (34, 26, "PORTFÓLIO", "DejaVu Serif", 16.5, True),
+                (274, 25, "VISIT", "Courier New", 11, True),
+            ], WIDTH, 44)
+            arrow_p = get_arrow_svg(316, 16, 10)
+            pen_underline = '''
+      <path d="M 32 32.0 C 58 31.2, 92 32.6, 122 31.4 C 135 30.9, 143 31.6, 150 31.0" 
+            stroke="#111111" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9" />
+      <path d="M 38 33.8 C 65 33.2, 98 34.2, 130 33.0 C 139 32.6, 144 33.0, 148 32.4" 
+            stroke="#111111" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.75" />
+'''
+            l_text = cairo_text_to_path([
+                (34, 27, "LINKEDIN", "DejaVu Serif", 16.5, True),
+                (264, 26, "CONNECT", "Courier New", 11, True),
+            ], WIDTH, 44)
+            arrow_l = get_arrow_svg(316, 17, 10)
 
-        rain_layer = ""
-        if animated:
-            rain_layer = """
-    <g opacity="0.85">
-      <line x1="45" y1="40" x2="48" y2="60" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="85" y1="70" x2="88" y2="90" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="120" y1="50" x2="123" y2="70" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="280" y1="60" x2="283" y2="80" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="315" y1="90" x2="318" y2="110" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="60" y1="130" x2="63" y2="150" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="295" y1="160" x2="298" y2="180" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="110" y1="210" x2="113" y2="230" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <line x1="270" y1="240" x2="273" y2="260" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
-      <animateTransform attributeName="transform" type="translate" from="0 -100" to="16 100" dur="0.8s" repeatCount="indefinite" />
-    </g>"""
+            t_stats = cairo_text_to_path([
+                (34, 38, "COMMITS", "Fira Sans Condensed", 10.5, True),
+                (142, 38, "STREAK", "Fira Sans Condensed", 10.5, True),
+                (248, 38, "RANK", "Fira Sans Condensed", 10.5, True),
+                (34, 55, c_val, "Fira Mono", 13.5, True),
+                (142, 55, s_val, "Fira Mono", 13.5, True),
+                (248, 55, r_val, "Fira Mono", 13.5, True),
+                (34, 79, "LOCATION", "Fira Sans Condensed", 10.5, True),
+                (180, 79, "UPDATED", "Fira Sans Condensed", 10.5, True),
+                (34, 96, l_val, "Fira Mono", 13.5, True),
+                (180, 96, d_val, "Fira Mono", 13.5, True),
+            ], WIDTH, 108)
 
-        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {HEIGHT}" width="{WIDTH}" height="{HEIGHT}">
-  <defs>
-    <clipPath id="ticket-clip"><path d="{self.d_ticket}" /></clipPath>
-  </defs>
-  <path d="{self.d_ticket}" fill="#efeee9" stroke="#dfded9" stroke-width="0.5" />
-  <g clip-path="url(#ticket-clip)">
-    <path d="{self.d_art}" fill="#111111" fill-rule="evenodd" />
-    {rain_layer}
+            if quote_obj is None:
+                quote_obj = get_daily_quote()
+            quote_d = render_quote_to_path(quote_obj)
+            q_elem = f'<g transform="translate(0, 572)"><path d="{quote_d}" fill="#111111" /></g>'
+
+        art_element = ""
+        if include_art:
+            if edition == "original":
+                art_element = f'<path d="{self.d_art}" fill="#111111" fill-rule="evenodd" />'
+            else:
+                art_element = f'<image href="slices/slice_01_art.gif" width="{WIDTH}" height="365" />'
+
+        if edition == "original":
+            body_content = f"""
+    {art_element}
     <g transform="translate(0, 365)"><path d="{t2}" fill="#111111" /></g>
     {umbrellas}
     <line x1="30" y1="413" x2="335" y2="413" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
@@ -500,24 +760,67 @@ class TicketGenerator:
     <line x1="30" y1="478" x2="335" y2="478" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
     <g transform="translate(0, 478)"><path d="{t4}" fill="#111111" /></g>
     <line x1="30" y1="571" x2="335" y2="571" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
-    <path d="{self.d_quote}" fill="#111111" fill-rule="evenodd" />
+    {q_elem}
+"""
+        else:
+            body_content = f"""
+    {art_element}
+    <!-- Section 2: Header -->
+    <g transform="translate(0, 365)"><path d="{t2}" fill="#111111" /></g>
+    {umbrellas}
+    <line x1="30" y1="413" x2="335" y2="413" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
+
+    <!-- Section 3: Portfólio Strip -->
+    <g transform="translate(0, 415)">
+      {pen_underline}
+      <path d="{p_text}" fill="#111111" />
+      {arrow_p}
+      <line x1="30" y1="43" x2="335" y2="43" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
+    </g>
+
+    <!-- Section 4: LinkedIn Strip -->
+    <g transform="translate(0, 459)">
+      <path d="{l_text}" fill="#111111" />
+      {arrow_l}
+      <line x1="30" y1="43" x2="335" y2="43" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
+    </g>
+
+    <!-- Section 5: Clean Stats Grid -->
+    <g transform="translate(0, 464)">
+      <path d="{t_stats}" fill="#111111" />
+      <line x1="30" y1="107" x2="335" y2="107" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
+    </g>
+
+    <!-- Section 6: Handwritten Literary Quote -->
+    {q_elem}
+"""
+
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {HEIGHT}" width="{WIDTH}" height="{HEIGHT}">
+  <defs>
+    <clipPath id="ticket-clip"><path d="{self.d_ticket}" /></clipPath>
+  </defs>
+  <path d="{self.d_ticket}" fill="#efeee9" stroke="#dfded9" stroke-width="0.5" />
+  <g clip-path="url(#ticket-clip)">
+{body_content}
   </g>
 </svg>"""
 
-    def generate_all(self, profile_data=None):
+    def generate_all(self, profile_data=None, quote_obj=None, force_gif=False):
         if profile_data is None:
             profile_data = {
                 "title": "GABRIEL GAMA · 2026",
                 "subtitle": "Front-end Developer • Brazil",
-                "role": "〔BR〕Gabriel Gama · Front-end Developer",
-                "stack": "React · TypeScript · UI Architecture · SVGs",
-                "links": "LinkedIn: /in/gabriel-gama · Portfolio: gabrielbaiano.vercel.app",
                 "commits": "+54 / wk",
                 "streak": "28 days",
                 "rank": "Top 5%",
                 "location": "Salvador, BR",
-                "date": "03/Oct/2026"
+                "date": datetime.datetime.now().strftime("%d/%b/%Y")
             }
+
+        if quote_obj is None:
+            quote_obj = get_daily_quote()
+
+        print(f"Active Daily Quote: [{quote_obj['book']}] \"{quote_obj['lines'][0]}\" ({quote_obj['attr']})")
 
         print("=== Generating Master SVGs ===")
         orig_svg = self.build_full_svg("original")
@@ -525,15 +828,10 @@ class TicketGenerator:
             f.write(orig_svg)
         print("Generated ticket_original.svg")
 
-        prof_svg = self.build_full_svg("profile", profile_data)
+        prof_svg = self.build_full_svg("profile", profile_data, quote_obj)
         with open(os.path.join(ASSETS_DIR, "ticket_profile.svg"), "w", encoding="utf-8") as f:
             f.write(prof_svg)
         print("Generated ticket_profile.svg")
-
-        anim_svg = self.build_full_svg("profile", profile_data, animated=True)
-        with open(os.path.join(ASSETS_DIR, "ticket_animated.svg"), "w", encoding="utf-8") as f:
-            f.write(anim_svg)
-        print("Generated ticket_animated.svg")
 
         print("=== Generating Slices ===")
         # Slices for profile
@@ -546,7 +844,7 @@ class TicketGenerator:
         with open(os.path.join(SLICES_DIR, "slice_05_stats.svg"), "w", encoding="utf-8") as f:
             f.write(self.build_slice_5_stats_svg("profile", profile_data))
         with open(os.path.join(SLICES_DIR, "slice_06_note.svg"), "w", encoding="utf-8") as f:
-            f.write(self.build_slice_6_note_svg("profile", profile_data))
+            f.write(self.build_slice_6_note_svg("profile", quote_obj))
 
         # Mirror slices to profile subdirectory
         prof_slices_dir = os.path.join(SLICES_DIR, "profile")
@@ -558,64 +856,70 @@ class TicketGenerator:
 
         print("=== Generating Animated GIFs ===")
         slice_1_gif = os.path.join(SLICES_DIR, "slice_01_art.gif")
-        if not os.path.exists(slice_1_gif):
-            self.generate_animated_rain_gif(slice_1_gif, full_ticket=False)
+        if force_gif or not os.path.exists(slice_1_gif):
+            self.generate_character_motion_gif(slice_1_gif, full_ticket=False)
+        # Also copy to profile subdirectory
+        dst_slice1 = os.path.join(prof_slices_dir, "slice_01_art.gif")
+        if os.path.exists(slice_1_gif):
+            with open(slice_1_gif, "rb") as f_in, open(dst_slice1, "wb") as f_out:
+                f_out.write(f_in.read())
 
         full_prof_gif = os.path.join(ASSETS_DIR, "ticket_profile.gif")
-        if not os.path.exists(full_prof_gif):
-            self.generate_animated_rain_gif(full_prof_gif, full_ticket=True, profile_data=profile_data)
+        if force_gif or not os.path.exists(full_prof_gif):
+            self.generate_character_motion_gif(full_prof_gif, full_ticket=True, profile_data=profile_data, quote_obj=quote_obj)
 
         print("=== Generating Profile Markdown Snippet ===")
         self.generate_profile_snippet()
 
         print("=== Generating Interactive Preview HTML ===")
-        self.generate_preview_html()
+        self.generate_preview_html(quote_obj)
         print("All assets generated successfully!")
 
     def generate_profile_snippet(self):
         snippet = """<!-- VINTAGE CINEMA TICKET PROFILE COMPONENT -->
 <!-- Engineered with zero-gap p + align=top slicing for GitHub Markdown -->
 <p align="center">
-  <img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /><br><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="ticket-profile/assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><img src="ticket-profile/assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /><br><img src="ticket-profile/assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" />
+  <img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="Manga Character Motion Art" /><br><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="ticket-profile/assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><img src="ticket-profile/assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /><br><img src="ticket-profile/assets/slices/slice_06_note.svg" width="394" align="top" alt="Handwritten Literary Quote" />
 </p>
 """
         with open(os.path.join(BASE_DIR, "profile_snippet.md"), "w", encoding="utf-8") as f:
             f.write(snippet)
 
-    def generate_preview_html(self):
-        html = """<!DOCTYPE html>
+    def generate_preview_html(self, quote_obj=None):
+        quote_title = f"{quote_obj['book']} ({quote_obj['author']})" if quote_obj else "Daily Literary Classic"
+        html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vintage Cinema Ticket Profile - Preview</title>
 <style>
-  body {
+  body {{
     margin: 0;
     padding: 40px 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  .theme-dark {
+  }}
+  .theme-dark {{
     background-color: #0d1117;
     color: #e6edf3;
-  }
-  .theme-light {
+  }}
+  .theme-light {{
     background-color: #ffffff;
     color: #1f2328;
-  }
-  .container {
+  }}
+  .container {{
     max-width: 900px;
     margin: 0 auto;
     text-align: center;
-  }
-  .controls {
+  }}
+  .controls {{
     margin-bottom: 30px;
     display: flex;
     justify-content: center;
     gap: 12px;
-  }
-  button {
+  }}
+  button {{
     background: #238636;
     color: #fff;
     border: none;
@@ -624,58 +928,43 @@ class TicketGenerator:
     border-radius: 6px;
     cursor: pointer;
     font-weight: 500;
-  }
-  button.secondary {
+  }}
+  button.secondary {{
     background: #30363d;
-  }
-  .ticket-wrapper {
+  }}
+  .ticket-wrapper {{
     display: inline-block;
     padding: 20px;
-  }
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin: 0 auto;
-    padding: 0;
-    border: none;
-  }
-  td {
-    padding: 0;
-    margin: 0;
-    line-height: 0;
-    font-size: 0;
-    border: none;
-  }
-  img {
-    display: block;
-    border: none;
-    margin: 0;
-    padding: 0;
-  }
-  .grid-preview {
+  }}
+  .grid-preview {{
     display: flex;
     justify-content: center;
     gap: 40px;
     flex-wrap: wrap;
     margin-top: 20px;
-  }
-  .card {
+  }}
+  .card {{
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 20px;
-  }
-  h2 {
+  }}
+  h2 {{
     font-size: 18px;
     margin-top: 0;
+    margin-bottom: 8px;
+  }}
+  .meta {{
+    font-size: 13px;
+    color: #8b949e;
     margin-bottom: 16px;
-  }
+  }}
 </style>
 </head>
 <body class="theme-dark" id="preview-body">
 <div class="container">
   <h1>Vintage Cinema Ticket GitHub Profile</h1>
-  <p>Zero-gap sliced architecture with transparent outer background and animated rain</p>
+  <p>Anime Motion Graphic · Clean Stats Grid · Rotating Literary Quotes</p>
   
   <div class="controls">
     <button onclick="setTheme('dark')">GitHub Dark Theme</button>
@@ -684,7 +973,8 @@ class TicketGenerator:
 
   <div class="grid-preview">
     <div class="card">
-      <h2>Sliced GitHub README Component (Only Portfólio & LinkedIn Clickable)</h2>
+      <h2>Sliced GitHub README Component</h2>
+      <div class="meta">Only Portfólio & LinkedIn Clickable · Zero Gap</div>
       <div class="ticket-wrapper">
         <p align="center" style="margin: 0; padding: 0;">
           <img src="assets/slices/slice_01_art.gif" width="394" align="top" /><br><img src="assets/slices/slice_02_header.svg" width="394" align="top" /><br><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_03_portfolio.svg" width="394" align="top" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" target="_blank"><img src="assets/slices/slice_04_linkedin.svg" width="394" align="top" /></a><br><img src="assets/slices/slice_05_stats.svg" width="394" align="top" /><br><img src="assets/slices/slice_06_note.svg" width="394" align="top" />
@@ -693,7 +983,8 @@ class TicketGenerator:
     </div>
 
     <div class="card">
-      <h2>Full Monolithic Animated GIF</h2>
+      <h2>Full Monolithic Ticket</h2>
+      <div class="meta">Quote: {quote_title}</div>
       <div class="ticket-wrapper">
         <img src="assets/ticket_profile.gif" width="394" height="705" />
       </div>
@@ -702,9 +993,9 @@ class TicketGenerator:
 </div>
 
 <script>
-  function setTheme(t) {
+  function setTheme(t) {{
     document.getElementById('preview-body').className = t === 'dark' ? 'theme-dark' : 'theme-light';
-  }
+  }}
 </script>
 </body>
 </html>"""
@@ -716,21 +1007,25 @@ if __name__ == "__main__":
     parser.add_argument("--commits", default="+54 / wk", help="Weekly commits count")
     parser.add_argument("--streak", default="28 days", help="Active streak")
     parser.add_argument("--rank", default="Top 5%", help="Rank or badge")
-    parser.add_argument("--date", default="03/Oct/2026", help="Ticket date")
+    parser.add_argument("--date", default=None, help="Ticket date (defaults to today)")
     parser.add_argument("--location", default="Salvador, BR", help="Location")
+    parser.add_argument("--quote-id", default=None, help="Specific quote ID")
+    parser.add_argument("--quote-index", type=int, default=None, help="Specific quote index (0..17)")
+    parser.add_argument("--force-gif", action="store_true", help="Force regenerate animated GIFs")
     args = parser.parse_args()
+
+    date_val = args.date if args.date else datetime.datetime.now().strftime("%d/%b/%Y")
 
     gen = TicketGenerator()
     data = {
         "title": "GABRIEL GAMA · 2026",
         "subtitle": "Front-end Developer • Brazil",
-        "role": "〔BR〕Gabriel Gama · Front-end Developer",
-        "stack": "React · TypeScript · UI Architecture · SVGs",
-        "links": "LinkedIn: /in/gabriel-gama · Portfolio: gabrielbaiano.vercel.app",
         "commits": args.commits,
         "streak": args.streak,
         "rank": args.rank,
         "location": args.location,
-        "date": args.date
+        "date": date_val
     }
-    gen.generate_all(data)
+
+    selected_quote = get_daily_quote(day_index=args.quote_index, quote_id=args.quote_id)
+    gen.generate_all(profile_data=data, quote_obj=selected_quote, force_gif=args.force_gif)
