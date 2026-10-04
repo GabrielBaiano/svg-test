@@ -317,32 +317,39 @@ class TicketGenerator:
 </svg>"""
 
     def build_slice_3_portfolio_svg(self):
-        """Slice 3: Portfólio (height 42)"""
+        """Slice 3: Portfólio with authentic organic pen underline (height 44)"""
         p_text = cairo_text_to_path([
-            (34, 27, "PORTFÓLIO", "DejaVu Serif", 16.5, True),
-            (274, 26, "VISIT", "Courier New", 11, True),
-        ], WIDTH, 42)
-        arrow = get_arrow_svg(316, 17, 10)
-        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} 42" width="{WIDTH}" height="42">
-  <rect x="19" y="0" width="326" height="42" fill="#efeee9" />
+            (34, 26, "PORTFÓLIO", "DejaVu Serif", 16.5, True),
+            (274, 25, "VISIT", "Courier New", 11, True),
+        ], WIDTH, 44)
+        arrow = get_arrow_svg(316, 16, 10)
+        # Organic double pen stroke (like quick hand marking with ballpoint/fountain pen)
+        pen_underline = '''
+  <path d="M 32 32.0 C 58 31.2, 92 32.6, 122 31.4 C 135 30.9, 143 31.6, 150 31.0" 
+        stroke="#111111" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9" />
+  <path d="M 38 33.8 C 65 33.2, 98 34.2, 130 33.0 C 139 32.6, 144 33.0, 148 32.4" 
+        stroke="#111111" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.75" />
+'''
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} 44" width="{WIDTH}" height="44">
+  <rect x="19" y="0" width="326" height="44" fill="#efeee9" />
+  {pen_underline}
   <path d="{p_text}" fill="#111111" />
   {arrow}
-  <line x1="30" y1="41" x2="335" y2="41" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
+  <line x1="30" y1="43" x2="335" y2="43" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
 </svg>"""
 
     def build_slice_4_linkedin_svg(self):
-        """Slice 4: LinkedIn (height 52) - Large text with vintage ticket stamp button"""
+        """Slice 4: LinkedIn (height 44) - Clean, matching portfolio without dashed stamp box"""
         l_text = cairo_text_to_path([
-            (48, 33, "LINKEDIN", "DejaVu Serif", 21, True),
-            (264, 32, "CONNECT", "Courier New", 11.5, True),
-        ], WIDTH, 52)
-        arrow = get_arrow_svg(318, 23, 10)
-        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} 52" width="{WIDTH}" height="52">
-  <rect x="19" y="0" width="326" height="52" fill="#efeee9" />
-  <rect x="32" y="8" width="300" height="36" rx="4" fill="none" stroke="#111111" stroke-width="1.3" stroke-dasharray="4 3" />
+            (34, 27, "LINKEDIN", "DejaVu Serif", 16.5, True),
+            (264, 26, "CONNECT", "Courier New", 11, True),
+        ], WIDTH, 44)
+        arrow = get_arrow_svg(316, 17, 10)
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} 44" width="{WIDTH}" height="44">
+  <rect x="19" y="0" width="326" height="44" fill="#efeee9" />
   <path d="{l_text}" fill="#111111" />
   {arrow}
-  <line x1="30" y1="51" x2="335" y2="51" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
+  <line x1="30" y1="43" x2="335" y2="43" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
 </svg>"""
 
     def build_slice_5_stats_svg(self, edition="profile", profile_data=None):
@@ -356,16 +363,16 @@ class TicketGenerator:
         d_val = profile_data.get("date", "03/Oct/2026")
 
         text_spec = [
-            (33, 36, "COMMITS :", "Courier New", 11, True),
-            (145, 36, "STREAK :", "Courier New", 11, True),
-            (255, 36, "RANK :", "Courier New", 11, True),
-            (33, 53, c_val, "Courier New", 12, True),
-            (145, 53, s_val, "Courier New", 12, True),
-            (255, 53, r_val, "Courier New", 12, True),
-            (33, 76, "LOCATION :", "Courier New", 11, True),
-            (145, 76, "UPDATED :", "Courier New", 11, True),
-            (33, 93, l_val, "Courier New", 12, True),
-            (145, 93, d_val, "Courier New", 12, True),
+            (34, 38, "COMMITS", "Fira Sans Condensed", 10.5, True),
+            (142, 38, "STREAK", "Fira Sans Condensed", 10.5, True),
+            (248, 38, "RANK", "Fira Sans Condensed", 10.5, True),
+            (34, 55, c_val, "Fira Mono", 13.5, True),
+            (142, 55, s_val, "Fira Mono", 13.5, True),
+            (248, 55, r_val, "Fira Mono", 13.5, True),
+            (34, 79, "LOCATION", "Fira Sans Condensed", 10.5, True),
+            (180, 79, "UPDATED", "Fira Sans Condensed", 10.5, True),
+            (34, 96, l_val, "Fira Mono", 13.5, True),
+            (180, 96, d_val, "Fira Mono", 13.5, True),
         ]
         text_d = cairo_text_to_path(text_spec, WIDTH, 108)
         return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 464 {WIDTH} 108" width="{WIDTH}" height="108">
@@ -377,6 +384,14 @@ class TicketGenerator:
     <g transform="translate(0, 464)">
       <path d="{text_d}" fill="#111111" />
     </g>
+    <!-- Column dividers in row 1 -->
+    <line x1="130" y1="496" x2="130" y2="522" stroke="#111111" stroke-width="1.1" stroke-dasharray="1 3" stroke-linecap="round" />
+    <line x1="236" y1="496" x2="236" y2="522" stroke="#111111" stroke-width="1.1" stroke-dasharray="1 3" stroke-linecap="round" />
+    <!-- Row divider -->
+    <line x1="34" y1="531" x2="330" y2="531" stroke="#111111" stroke-width="1.0" stroke-dasharray="2 3" stroke-linecap="round" opacity="0.6" />
+    <!-- Column divider in row 2 -->
+    <line x1="168" y1="537" x2="168" y2="563" stroke="#111111" stroke-width="1.1" stroke-dasharray="1 3" stroke-linecap="round" />
+    <!-- Bottom line -->
     <line x1="30" y1="571" x2="335" y2="571" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
   </g>
 </svg>"""
@@ -442,16 +457,16 @@ class TicketGenerator:
                 (32, 45, links, "Noto Serif CJK SC", 8.5, False)
             ], WIDTH, 63)
             t4 = cairo_text_to_path([
-                (33, 22, "COMMITS :", "Courier New", 11, True),
-                (145, 22, "STREAK :", "Courier New", 11, True),
-                (255, 22, "RANK :", "Courier New", 11, True),
-                (33, 39, c_val, "Courier New", 12, True),
-                (145, 39, s_val, "Courier New", 12, True),
-                (255, 39, r_val, "Courier New", 12, True),
-                (33, 62, "LOCATION :", "Courier New", 11, True),
-                (145, 62, "UPDATED :", "Courier New", 11, True),
-                (33, 79, l_val, "Courier New", 12, True),
-                (145, 79, d_val, "Courier New", 12, True),
+                (34, 20, "COMMITS", "Fira Sans Condensed", 10.5, True),
+                (142, 20, "STREAK", "Fira Sans Condensed", 10.5, True),
+                (248, 20, "RANK", "Fira Sans Condensed", 10.5, True),
+                (34, 37, c_val, "Fira Mono", 13.5, True),
+                (142, 37, s_val, "Fira Mono", 13.5, True),
+                (248, 37, r_val, "Fira Mono", 13.5, True),
+                (34, 61, "LOCATION", "Fira Sans Condensed", 10.5, True),
+                (180, 61, "UPDATED", "Fira Sans Condensed", 10.5, True),
+                (34, 78, l_val, "Fira Mono", 13.5, True),
+                (180, 78, d_val, "Fira Mono", 13.5, True),
             ], WIDTH, 94)
 
         rain_layer = ""
@@ -532,6 +547,14 @@ class TicketGenerator:
             f.write(self.build_slice_5_stats_svg("profile", profile_data))
         with open(os.path.join(SLICES_DIR, "slice_06_note.svg"), "w", encoding="utf-8") as f:
             f.write(self.build_slice_6_note_svg("profile", profile_data))
+
+        # Mirror slices to profile subdirectory
+        prof_slices_dir = os.path.join(SLICES_DIR, "profile")
+        for s_name in ["slice_02_header.svg", "slice_03_portfolio.svg", "slice_04_linkedin.svg", "slice_05_stats.svg", "slice_06_note.svg"]:
+            src = os.path.join(SLICES_DIR, s_name)
+            dst = os.path.join(prof_slices_dir, s_name)
+            with open(src, "r", encoding="utf-8") as f_in, open(dst, "w", encoding="utf-8") as f_out:
+                f_out.write(f_in.read())
 
         print("=== Generating Animated GIFs ===")
         slice_1_gif = os.path.join(SLICES_DIR, "slice_01_art.gif")

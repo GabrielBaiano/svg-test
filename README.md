@@ -23,10 +23,10 @@ GitHub Markdown sanitizes JavaScript and restricts interactive inline SVG links 
 │ (Gabriel Gama / Chinese Cinema homage + Umbrellas)     │
 ├────────────────────────────────────────────────────────┤
 │ SLICE 3: Portfólio Strip                               │ -> Links to Portfolio
-│ (Vintage serif Portfólio + Visit arrow)                │
+│ (Vintage serif Portfólio + Pen ink underline + Arrow)  │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 4: LinkedIn Ticket Stamp Button                  │ -> Links to LinkedIn
-│ (Big bold LinkedIn + Connect coupon badge)             │
+│ SLICE 4: LinkedIn Strip                                │ -> Links to LinkedIn
+│ (Clean vintage serif LinkedIn + Connect arrow)         │
 ├────────────────────────────────────────────────────────┤
 │ SLICE 5: Activity Grid & Admission Side Notches        │ -> Links to GitHub Repos
 │ (Commits/wk, Streak, Rank, Location, Updated Date)     │
@@ -66,9 +66,9 @@ ticket-profile/
 │       ├── slice_01_art.gif        # Animated rain art slice (top scallop + woodcut)
 │       ├── slice_01_art.svg        # Static/SMIL vector art slice
 │       ├── slice_02_header.svg     # Title, English subtitle, 3 umbrella icons
-│       ├── slice_03_portfolio.svg  # Dedicated Portfólio strip & visit indicator
-│       ├── slice_04_linkedin.svg   # Big bold LinkedIn & connect ticket stamp
-│       ├── slice_05_stats.svg      # Commits grid with circular side admission notches
+│       ├── slice_03_portfolio.svg  # Portfólio strip with organic pen underline
+│       ├── slice_04_linkedin.svg   # Clean LinkedIn strip matching Portfólio
+│       ├── slice_05_stats.svg      # Refined commits grid with admission notches
 │       └── slice_06_note.svg       # Authentic cursive calligraphy & bottom teeth
 ├── scripts/
 │   └── generate_ticket.py          # Master generator, compositor, and GIF compiler
