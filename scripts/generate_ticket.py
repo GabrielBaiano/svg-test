@@ -576,7 +576,7 @@ class TicketGenerator:
         snippet = """<!-- VINTAGE CINEMA TICKET PROFILE COMPONENT -->
 <!-- Engineered with zero-gap p + align=top slicing for GitHub Markdown -->
 <p align="center">
-  <a href="https://gabrielbaiano.vercel.app/" title="Portfolio"><img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer"><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="ticket-profile/assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories"><img src="ticket-profile/assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Daily Note"><img src="ticket-profile/assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" /></a>
+  <img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /><br><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="ticket-profile/assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><img src="ticket-profile/assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /><br><img src="ticket-profile/assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" />
 </p>
 """
         with open(os.path.join(BASE_DIR, "profile_snippet.md"), "w", encoding="utf-8") as f:
@@ -684,10 +684,10 @@ class TicketGenerator:
 
   <div class="grid-preview">
     <div class="card">
-      <h2>Sliced GitHub README Component (Clickable Links)</h2>
+      <h2>Sliced GitHub README Component (Only Portfólio & LinkedIn Clickable)</h2>
       <div class="ticket-wrapper">
         <p align="center" style="margin: 0; padding: 0;">
-          <a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_01_art.gif" width="394" align="top" /></a><br><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_02_header.svg" width="394" align="top" /></a><br><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_03_portfolio.svg" width="394" align="top" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" target="_blank"><img src="assets/slices/slice_04_linkedin.svg" width="394" align="top" /></a><br><a href="https://github.com/GabrielBaiano" target="_blank"><img src="assets/slices/slice_05_stats.svg" width="394" align="top" /></a><br><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_06_note.svg" width="394" align="top" /></a>
+          <img src="assets/slices/slice_01_art.gif" width="394" align="top" /><br><img src="assets/slices/slice_02_header.svg" width="394" align="top" /><br><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_03_portfolio.svg" width="394" align="top" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" target="_blank"><img src="assets/slices/slice_04_linkedin.svg" width="394" align="top" /></a><br><img src="assets/slices/slice_05_stats.svg" width="394" align="top" /><br><img src="assets/slices/slice_06_note.svg" width="394" align="top" />
         </p>
       </div>
     </div>

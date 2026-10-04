@@ -1,7 +1,7 @@
 # Vintage Cinema Ticket Profile Component
 
 <p align="center">
-  <a href="https://gabrielbaiano.vercel.app/" title="Portfolio"><img src="assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer"><img src="assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories"><img src="assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Daily Note"><img src="assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" /></a>
+  <img src="assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /><br><img src="assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><img src="assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /><br><img src="assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" />
 </p>
 
 <br />
@@ -16,22 +16,22 @@ GitHub Markdown sanitizes JavaScript and restricts interactive inline SVG links 
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│ SLICE 1: Animated Woodcut Artwork (Rain GIF / SVG)     │ -> Links to Portfolio
+│ SLICE 1: Animated Woodcut Artwork (Rain GIF / SVG)     │
 │ (Top scalloped perforations + Umbrella + Skyline)      │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 2: Title & Badge Header                          │ -> Links to Portfolio
+│ SLICE 2: Title & Badge Header                          │
 │ (Gabriel Gama / Chinese Cinema homage + Umbrellas)     │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 3: Portfólio Strip                               │ -> Links to Portfolio
+│ SLICE 3: Portfólio Strip (CLICKABLE)                   │ -> https://gabrielbaiano.vercel.app/
 │ (Vintage serif Portfólio + Pen ink underline + Arrow)  │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 4: LinkedIn Strip                                │ -> Links to LinkedIn
+│ SLICE 4: LinkedIn Strip (CLICKABLE)                    │ -> https://www.linkedin.com/in/gabriel-gama-6301633b2/
 │ (Clean vintage serif LinkedIn + Connect arrow)         │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 5: Activity Grid & Admission Side Notches        │ -> Links to GitHub Repos
+│ SLICE 5: Activity Grid & Admission Side Notches        │
 │ (Commits/wk, Streak, Rank, Location, Updated Date)     │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 6: Handwritten Note & Bottom Perforations        │ -> Links to Daily Note / Bio
+│ SLICE 6: Handwritten Note & Bottom Perforations        │
 │ (Authentic cursive ink calligraphy + Bottom teeth)     │
 └────────────────────────────────────────────────────────┘
 ```
@@ -46,7 +46,7 @@ Paste this block into your profile `README.md` (e.g. `GabrielBaiano/README.md`):
 
 ```html
 <p align="center">
-  <a href="https://gabrielbaiano.vercel.app/" title="Portfolio"><img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer"><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="ticket-profile/assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories"><img src="ticket-profile/assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Daily Note"><img src="ticket-profile/assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" /></a>
+  <img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /><br><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="ticket-profile/assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><img src="ticket-profile/assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /><br><img src="ticket-profile/assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" />
 </p>
 ```
 
