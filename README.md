@@ -15,7 +15,7 @@ GitHub Markdown sanitizes JavaScript and restricts interactive inline SVG links 
 ```
 ┌────────────────────────────────────────────────────────┐
 │ SLICE 1: Anime Motion Graphics (Art GIF / SVG)         │
-│ (Hypnotic spiral eyes + Floating DEPPAQ + Ink sparks)   │
+│ (Hypnotic spiral eyes + Floating DEPPAQ mascot)        │
 ├────────────────────────────────────────────────────────┤
 │ SLICE 2: Title & Badge Header                          │
 │ (Gabriel Gama · 2026 + Developer info + 3 Umbrellas)   │

@@ -317,26 +317,6 @@ def render_quote_to_path(quote_obj):
     
     return cairo_text_to_path(spec, WIDTH, 133)
 
-def draw_cursed_sparks(draw, origin, phase, num_sparks=2):
-    """Draws crackling ink sparks around hand seals."""
-    ox, oy = origin
-    np.random.seed(int(phase * 1000) % 9999)
-    for _ in range(num_sparks):
-        angle = np.random.uniform(0, 2 * math.pi)
-        dist = np.random.uniform(8, 24)
-        curr = (ox, oy)
-        points = [curr]
-        for s in range(3):
-            step = dist / 3
-            nx = curr[0] + step * math.cos(angle) + np.random.uniform(-3, 3)
-            ny = curr[1] + step * math.sin(angle) + np.random.uniform(-3, 3)
-            points.append((nx, ny))
-            curr = (nx, ny)
-        for i in range(len(points) - 1):
-            w = 2.0 if i == 0 else 1.2
-            draw.line([points[i], points[i+1]], fill=(17, 17, 17, 240), width=int(w))
-
-
 class TicketGenerator:
     def __init__(self):
         self.d_ticket = load_path_file("ticket_perimeter_path.txt")
@@ -491,14 +471,6 @@ class TicketGenerator:
             dep_y = int(char_y + deppaq_box[1] * scale + deppaq_dy)
             frame.alpha_composite(dep_rotated, (dep_x, dep_y))
 
-            # Crackling cursed energy sparks
-            spark_img = Image.new("RGBA", (WIDTH, 365), (0, 0, 0, 0))
-            d_spark = ImageDraw.Draw(spark_img)
-            finger_pt = (char_x + int(276 * (cur_w / 322)), char_y + int(268 * (cur_h / char_h)))
-            draw_cursed_sparks(d_spark, finger_pt, t + 0.2, num_sparks=2)
-            chest_pt = (char_x + int(195 * (cur_w / 322)), char_y + int(195 * (cur_h / char_h)))
-            draw_cursed_sparks(d_spark, chest_pt, t + 0.7, num_sparks=1)
-            frame.alpha_composite(spark_img, (0, 0))
 
             # Alpha mask with scalloped ticket teeth
             r, g, b, a = frame.split()
