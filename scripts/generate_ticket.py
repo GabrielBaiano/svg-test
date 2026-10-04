@@ -47,6 +47,13 @@ def load_path_file(filename):
     with open(path, "r", encoding="utf-8") as f:
         return f.read().strip()
 
+def get_arrow_svg(x, y, size=11):
+    return f"""<g transform="translate({x}, {y})">
+      <line x1="0" y1="{size}" x2="{size}" y2="0" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
+      <line x1="{size*0.4}" y1="0" x2="{size}" y2="0" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
+      <line x1="{size}" y1="0" x2="{size}" y2="{size*0.6}" stroke="#111111" stroke-width="1.8" stroke-linecap="round" />
+    </g>"""
+
 def get_umbrella_svg(x, y, scale=1.0):
     return f"""
     <g transform="translate({x}, {y}) scale({scale}) rotate(15)">
@@ -309,88 +316,80 @@ class TicketGenerator:
   </g>
 </svg>"""
 
-    def build_slice_3_svg(self, edition="profile", profile_data=None):
-        """Slice 3: Social & Developer Info (y: 415..478, height 63)"""
-        if edition == "original":
-            text_spec = [
-                (32, 17, "〔美国〕伍迪·艾伦 Woody Allen", "Noto Serif CJK SC", 11.5, True),
-                (33, 31, "Comedy/Romance", "Courier New", 10, True),
-                (32, 45, "26/Jul/2019(波兰) / 2022-02-25(中国大陆) / 92分钟", "Noto Serif CJK SC", 9, False)
-            ]
-        else:
-            role = profile_data.get("role", "〔BR〕Gabriel Gama · Front-end Developer")
-            stack = profile_data.get("stack", "React · TypeScript · UI Architecture · SVGs")
-            links = profile_data.get("links", "LinkedIn: /in/gabriel-gama · Portfolio: gabrielbaiano.vercel.app")
-            text_spec = [
-                (32, 17, role, "Noto Serif CJK SC", 11, True),
-                (33, 31, stack, "Courier New", 9.5, True),
-                (32, 45, links, "Noto Serif CJK SC", 8.5, False)
-            ]
-            
-        text_d = cairo_text_to_path(text_spec, WIDTH, 63)
-        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 415 {WIDTH} 63" width="{WIDTH}" height="63">
-  <defs>
-    <clipPath id="t-clip-3"><path d="{self.d_ticket}" /></clipPath>
-  </defs>
-  <path d="{self.d_ticket}" fill="#efeee9" />
-  <g clip-path="url(#t-clip-3)">
-    <g transform="translate(0, 415)">
-      <path d="{text_d}" fill="#111111" />
-    </g>
-    <line x1="30" y1="478" x2="335" y2="478" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
-  </g>
+    def build_slice_3_portfolio_svg(self):
+        """Slice 3: Portfólio (height 42)"""
+        p_text = cairo_text_to_path([
+            (34, 27, "PORTFÓLIO", "DejaVu Serif", 16.5, True),
+            (274, 26, "VISIT", "Courier New", 11, True),
+        ], WIDTH, 42)
+        arrow = get_arrow_svg(316, 17, 10)
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} 42" width="{WIDTH}" height="42">
+  <rect x="19" y="0" width="326" height="42" fill="#efeee9" />
+  <path d="{p_text}" fill="#111111" />
+  {arrow}
+  <line x1="30" y1="41" x2="335" y2="41" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
 </svg>"""
 
-    def build_slice_4_svg(self, edition="profile", profile_data=None):
-        """Slice 4: Stats Grid & Side Admission Notches (y: 478..572, height 94)"""
-        if edition == "original":
-            h1, v1 = "HALL :", "06"
-            h2, v2 = "SEAT :", "06-08"
-            h3, v3 = "PRICE :", "39.9"
-            h4, v4 = "DATE :", "20/Jul/2025"
-            h5, v5 = "TIME :", "20:00 - 21:32"
-        else:
-            h1, v1 = "COMMITS :", profile_data.get("commits", "+54 / wk")
-            h2, v2 = "STREAK :", profile_data.get("streak", "28 days")
-            h3, v3 = "RANK :", profile_data.get("rank", "Top 5%")
-            h4, v4 = "LOCATION :", profile_data.get("location", "Salvador, BR")
-            h5, v5 = "UPDATED :", profile_data.get("date", "03/Oct/2026")
+    def build_slice_4_linkedin_svg(self):
+        """Slice 4: LinkedIn (height 52) - Large text with vintage ticket stamp button"""
+        l_text = cairo_text_to_path([
+            (48, 33, "LINKEDIN", "DejaVu Serif", 21, True),
+            (264, 32, "CONNECT", "Courier New", 11.5, True),
+        ], WIDTH, 52)
+        arrow = get_arrow_svg(318, 23, 10)
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} 52" width="{WIDTH}" height="52">
+  <rect x="19" y="0" width="326" height="52" fill="#efeee9" />
+  <rect x="32" y="8" width="300" height="36" rx="4" fill="none" stroke="#111111" stroke-width="1.3" stroke-dasharray="4 3" />
+  <path d="{l_text}" fill="#111111" />
+  {arrow}
+  <line x1="30" y1="51" x2="335" y2="51" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
+</svg>"""
+
+    def build_slice_5_stats_svg(self, edition="profile", profile_data=None):
+        """Slice 5: Stats Grid & Circular Admission Notches (height 108, y: 464..572)"""
+        if profile_data is None:
+            profile_data = {}
+        c_val = profile_data.get("commits", "+54 / wk")
+        s_val = profile_data.get("streak", "28 days")
+        r_val = profile_data.get("rank", "Top 5%")
+        l_val = profile_data.get("location", "Salvador, BR")
+        d_val = profile_data.get("date", "03/Oct/2026")
 
         text_spec = [
-            (33, 22, h1, "Courier New", 11, True),
-            (145, 22, h2, "Courier New", 11, True),
-            (255, 22, h3, "Courier New", 11, True),
-            (33, 39, v1, "Courier New", 12, True),
-            (145, 39, v2, "Courier New", 12, True),
-            (255, 39, v3, "Courier New", 12, True),
-            (33, 62, h4, "Courier New", 11, True),
-            (145, 62, h5, "Courier New", 11, True),
-            (33, 79, v4, "Courier New", 12, True),
-            (145, 79, v5, "Courier New", 12, True),
+            (33, 36, "COMMITS :", "Courier New", 11, True),
+            (145, 36, "STREAK :", "Courier New", 11, True),
+            (255, 36, "RANK :", "Courier New", 11, True),
+            (33, 53, c_val, "Courier New", 12, True),
+            (145, 53, s_val, "Courier New", 12, True),
+            (255, 53, r_val, "Courier New", 12, True),
+            (33, 76, "LOCATION :", "Courier New", 11, True),
+            (145, 76, "UPDATED :", "Courier New", 11, True),
+            (33, 93, l_val, "Courier New", 12, True),
+            (145, 93, d_val, "Courier New", 12, True),
         ]
-        text_d = cairo_text_to_path(text_spec, WIDTH, 94)
-        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 478 {WIDTH} 94" width="{WIDTH}" height="94">
+        text_d = cairo_text_to_path(text_spec, WIDTH, 108)
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 464 {WIDTH} 108" width="{WIDTH}" height="108">
   <defs>
-    <clipPath id="t-clip-4"><path d="{self.d_ticket}" /></clipPath>
+    <clipPath id="t-clip-5"><path d="{self.d_ticket}" /></clipPath>
   </defs>
   <path d="{self.d_ticket}" fill="#efeee9" />
-  <g clip-path="url(#t-clip-4)">
-    <g transform="translate(0, 478)">
+  <g clip-path="url(#t-clip-5)">
+    <g transform="translate(0, 464)">
       <path d="{text_d}" fill="#111111" />
     </g>
     <line x1="30" y1="571" x2="335" y2="571" stroke="#111111" stroke-width="1.5" stroke-dasharray="1 3" stroke-linecap="round" />
   </g>
 </svg>"""
 
-    def build_slice_5_svg(self, edition="profile", profile_data=None):
-        """Slice 5: Handwritten Note & Bottom Scalloped Perforation (y: 572..705, height 133)"""
+    def build_slice_6_note_svg(self, edition="profile", profile_data=None):
+        """Slice 6: Handwritten Note & Bottom Scalloped Perforation (y: 572..705, height 133)"""
         quote_content = f'<path d="{self.d_quote}" fill="#111111" fill-rule="evenodd" />'
         return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 572 {WIDTH} 133" width="{WIDTH}" height="133">
   <defs>
-    <clipPath id="t-clip-5"><path d="{self.d_ticket}" /></clipPath>
+    <clipPath id="t-clip-6"><path d="{self.d_ticket}" /></clipPath>
   </defs>
   <path d="{self.d_ticket}" fill="#efeee9" />
-  <g clip-path="url(#t-clip-5)">
+  <g clip-path="url(#t-clip-6)">
     {quote_content}
   </g>
 </svg>"""
@@ -522,43 +521,26 @@ class TicketGenerator:
         print("Generated ticket_animated.svg")
 
         print("=== Generating Slices ===")
-        for ed in ["original", "profile"]:
-            ed_dir = os.path.join(SLICES_DIR, ed)
-            p_data = None if ed == "original" else profile_data
-            
-            with open(os.path.join(ed_dir, "slice_01_art.svg"), "w", encoding="utf-8") as f:
-                f.write(self.build_slice_1_svg(animated=False))
-            with open(os.path.join(ed_dir, "slice_02_header.svg"), "w", encoding="utf-8") as f:
-                f.write(self.build_slice_2_svg(ed, p_data))
-            with open(os.path.join(ed_dir, "slice_03_social.svg"), "w", encoding="utf-8") as f:
-                f.write(self.build_slice_3_svg(ed, p_data))
-            with open(os.path.join(ed_dir, "slice_04_stats.svg"), "w", encoding="utf-8") as f:
-                f.write(self.build_slice_4_svg(ed, p_data))
-            with open(os.path.join(ed_dir, "slice_05_note.svg"), "w", encoding="utf-8") as f:
-                f.write(self.build_slice_5_svg(ed, p_data))
-
-        # Copy profile slices to main slices folder
-        for f_name in ["slice_02_header.svg", "slice_03_social.svg", "slice_04_stats.svg", "slice_05_note.svg"]:
-            src = os.path.join(SLICES_DIR, "profile", f_name)
-            dst = os.path.join(SLICES_DIR, f_name)
-            with open(src, "r", encoding="utf-8") as sf, open(dst, "w", encoding="utf-8") as df:
-                df.write(sf.read())
+        # Slices for profile
+        with open(os.path.join(SLICES_DIR, "slice_02_header.svg"), "w", encoding="utf-8") as f:
+            f.write(self.build_slice_2_svg("profile", profile_data))
+        with open(os.path.join(SLICES_DIR, "slice_03_portfolio.svg"), "w", encoding="utf-8") as f:
+            f.write(self.build_slice_3_portfolio_svg())
+        with open(os.path.join(SLICES_DIR, "slice_04_linkedin.svg"), "w", encoding="utf-8") as f:
+            f.write(self.build_slice_4_linkedin_svg())
+        with open(os.path.join(SLICES_DIR, "slice_05_stats.svg"), "w", encoding="utf-8") as f:
+            f.write(self.build_slice_5_stats_svg("profile", profile_data))
+        with open(os.path.join(SLICES_DIR, "slice_06_note.svg"), "w", encoding="utf-8") as f:
+            f.write(self.build_slice_6_note_svg("profile", profile_data))
 
         print("=== Generating Animated GIFs ===")
         slice_1_gif = os.path.join(SLICES_DIR, "slice_01_art.gif")
-        self.generate_animated_rain_gif(slice_1_gif, full_ticket=False)
-        with open(slice_1_gif, "rb") as rf:
-            gif_data = rf.read()
-        with open(os.path.join(SLICES_DIR, "profile", "slice_01_art.gif"), "wb") as wf:
-            wf.write(gif_data)
-        with open(os.path.join(SLICES_DIR, "original", "slice_01_art.gif"), "wb") as wf:
-            wf.write(gif_data)
+        if not os.path.exists(slice_1_gif):
+            self.generate_animated_rain_gif(slice_1_gif, full_ticket=False)
 
         full_prof_gif = os.path.join(ASSETS_DIR, "ticket_profile.gif")
-        self.generate_animated_rain_gif(full_prof_gif, full_ticket=True, profile_data=profile_data)
-
-        full_orig_gif = os.path.join(ASSETS_DIR, "ticket_original.gif")
-        self.generate_animated_rain_gif(full_orig_gif, full_ticket=True, profile_data=None)
+        if not os.path.exists(full_prof_gif):
+            self.generate_animated_rain_gif(full_prof_gif, full_ticket=True, profile_data=profile_data)
 
         print("=== Generating Profile Markdown Snippet ===")
         self.generate_profile_snippet()
@@ -569,46 +551,10 @@ class TicketGenerator:
 
     def generate_profile_snippet(self):
         snippet = """<!-- VINTAGE CINEMA TICKET PROFILE COMPONENT -->
-<!-- Engineered with zero-gap table slicing for GitHub Markdown -->
-<div align="center">
-  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; border-spacing: 0; margin: 0 auto; padding: 0; border: none;">
-    <tr>
-      <td style="padding: 0; margin: 0; line-height: 0; font-size: 0; border: none;">
-        <a href="https://gabrielbaiano.vercel.app/" title="Portfolio">
-          <img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" height="365" alt="A Rainy Day in New York Illustration" style="display: block; border: none; margin: 0; padding: 0;" />
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 0; margin: 0; line-height: 0; font-size: 0; border: none;">
-        <a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer">
-          <img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" height="50" alt="Ticket Header" style="display: block; border: none; margin: 0; padding: 0;" />
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 0; margin: 0; line-height: 0; font-size: 0; border: none;">
-        <a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn">
-          <img src="ticket-profile/assets/slices/slice_03_social.svg" width="394" height="63" alt="Social Links" style="display: block; border: none; margin: 0; padding: 0;" />
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 0; margin: 0; line-height: 0; font-size: 0; border: none;">
-        <a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories">
-          <img src="ticket-profile/assets/slices/slice_04_stats.svg" width="394" height="94" alt="Commit Activity & Stats" style="display: block; border: none; margin: 0; padding: 0;" />
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 0; margin: 0; line-height: 0; font-size: 0; border: none;">
-        <a href="https://gabrielbaiano.vercel.app/" title="Daily Note">
-          <img src="ticket-profile/assets/slices/slice_05_note.svg" width="394" height="133" alt="Vintage Handwritten Note" style="display: block; border: none; margin: 0; padding: 0;" />
-        </a>
-      </td>
-    </tr>
-  </table>
-</div>
+<!-- Engineered with zero-gap p + align=top slicing for GitHub Markdown -->
+<p align="center">
+  <a href="https://gabrielbaiano.vercel.app/" title="Portfolio"><img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer"><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="ticket-profile/assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories"><img src="ticket-profile/assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Daily Note"><img src="ticket-profile/assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" /></a>
+</p>
 """
         with open(os.path.join(BASE_DIR, "profile_snippet.md"), "w", encoding="utf-8") as f:
             f.write(snippet)
@@ -717,13 +663,9 @@ class TicketGenerator:
     <div class="card">
       <h2>Sliced GitHub README Component (Clickable Links)</h2>
       <div class="ticket-wrapper">
-        <table border="0" cellpadding="0" cellspacing="0">
-          <tr><td><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_01_art.gif" width="394" height="365" /></a></td></tr>
-          <tr><td><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_02_header.svg" width="394" height="50" /></a></td></tr>
-          <tr><td><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" target="_blank"><img src="assets/slices/slice_03_social.svg" width="394" height="63" /></a></td></tr>
-          <tr><td><a href="https://github.com/GabrielBaiano" target="_blank"><img src="assets/slices/slice_04_stats.svg" width="394" height="94" /></a></td></tr>
-          <tr><td><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_05_note.svg" width="394" height="133" /></a></td></tr>
-        </table>
+        <p align="center" style="margin: 0; padding: 0;">
+          <a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_01_art.gif" width="394" align="top" /></a><br><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_02_header.svg" width="394" align="top" /></a><br><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_03_portfolio.svg" width="394" align="top" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" target="_blank"><img src="assets/slices/slice_04_linkedin.svg" width="394" align="top" /></a><br><a href="https://github.com/GabrielBaiano" target="_blank"><img src="assets/slices/slice_05_stats.svg" width="394" align="top" /></a><br><a href="https://gabrielbaiano.vercel.app/" target="_blank"><img src="assets/slices/slice_06_note.svg" width="394" align="top" /></a>
+        </p>
       </div>
     </div>
 

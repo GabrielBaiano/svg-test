@@ -1,7 +1,7 @@
 # Vintage Cinema Ticket Profile Component
 
 <p align="center">
-  <a href="https://gabrielbaiano.vercel.app/" title="Portfolio"><img src="assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer"><img src="assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="assets/slices/slice_03_social.svg" width="394" align="top" alt="Social Links" /></a><br><a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories"><img src="assets/slices/slice_04_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Daily Note"><img src="assets/slices/slice_05_note.svg" width="394" align="top" alt="Vintage Handwritten Note" /></a>
+  <a href="https://gabrielbaiano.vercel.app/" title="Portfolio"><img src="assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer"><img src="assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories"><img src="assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Daily Note"><img src="assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" /></a>
 </p>
 
 <br />
@@ -12,7 +12,7 @@ Inspired by the authentic ticket stub design of *"A Rainy Day in New York (2019)
 
 ## Visual Architecture & Slicing Strategy
 
-GitHub Markdown sanitizes JavaScript and restricts interactive inline SVG links when embedded via `<img>`. To provide **high-resolution vector typography**, an **animated rain loop**, and **independent clickable links** on every section with **zero gap**, the ticket is sliced into 5 horizontal rows stacked using `<p align="center">` and `<img align="top">` with `<br>` line breaks.
+GitHub Markdown sanitizes JavaScript and restricts interactive inline SVG links when embedded via `<img>`. To provide **high-resolution vector typography**, an **animated rain loop**, and **independent clickable links** on every section with **zero gap**, the ticket is sliced into 6 horizontal rows stacked using `<p align="center">` and `<img align="top">` with `<br>` line breaks.
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -22,13 +22,16 @@ GitHub Markdown sanitizes JavaScript and restricts interactive inline SVG links 
 │ SLICE 2: Title & Badge Header                          │ -> Links to Portfolio
 │ (Gabriel Gama / Chinese Cinema homage + Umbrellas)     │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 3: Developer Role & Social Coordinates           │ -> Links to LinkedIn
-│ (Front-end Dev • TypeScript / React • Brazil)          │
+│ SLICE 3: Portfólio Strip                               │ -> Links to Portfolio
+│ (Vintage serif Portfólio + Visit arrow)                │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 4: Activity Grid & Admission Side Notches        │ -> Links to GitHub Repos
+│ SLICE 4: LinkedIn Ticket Stamp Button                  │ -> Links to LinkedIn
+│ (Big bold LinkedIn + Connect coupon badge)             │
+├────────────────────────────────────────────────────────┤
+│ SLICE 5: Activity Grid & Admission Side Notches        │ -> Links to GitHub Repos
 │ (Commits/wk, Streak, Rank, Location, Updated Date)     │
 ├────────────────────────────────────────────────────────┤
-│ SLICE 5: Handwritten Note & Bottom Perforations        │ -> Links to Daily Note / Bio
+│ SLICE 6: Handwritten Note & Bottom Perforations        │ -> Links to Daily Note / Bio
 │ (Authentic cursive ink calligraphy + Bottom teeth)     │
 └────────────────────────────────────────────────────────┘
 ```
@@ -43,7 +46,7 @@ Paste this block into your profile `README.md` (e.g. `GabrielBaiano/README.md`):
 
 ```html
 <p align="center">
-  <a href="https://gabrielbaiano.vercel.app/" title="Portfolio"><img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer"><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_03_social.svg" width="394" align="top" alt="Social Links" /></a><br><a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories"><img src="ticket-profile/assets/slices/slice_04_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Daily Note"><img src="ticket-profile/assets/slices/slice_05_note.svg" width="394" align="top" alt="Vintage Handwritten Note" /></a>
+  <a href="https://gabrielbaiano.vercel.app/" title="Portfolio"><img src="ticket-profile/assets/slices/slice_01_art.gif" width="394" align="top" alt="A Rainy Day in New York Illustration" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Gabriel Gama - Front-end Developer"><img src="ticket-profile/assets/slices/slice_02_header.svg" width="394" align="top" alt="Ticket Header" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Portfólio"><img src="ticket-profile/assets/slices/slice_03_portfolio.svg" width="394" align="top" alt="Portfólio" /></a><br><a href="https://www.linkedin.com/in/gabriel-gama-6301633b2/" title="Connect on LinkedIn"><img src="ticket-profile/assets/slices/slice_04_linkedin.svg" width="394" align="top" alt="LinkedIn" /></a><br><a href="https://github.com/GabrielBaiano?tab=repositories" title="View GitHub Repositories"><img src="ticket-profile/assets/slices/slice_05_stats.svg" width="394" align="top" alt="Commit Activity & Stats" /></a><br><a href="https://gabrielbaiano.vercel.app/" title="Daily Note"><img src="ticket-profile/assets/slices/slice_06_note.svg" width="394" align="top" alt="Vintage Handwritten Note" /></a>
 </p>
 ```
 
@@ -63,9 +66,10 @@ ticket-profile/
 │       ├── slice_01_art.gif        # Animated rain art slice (top scallop + woodcut)
 │       ├── slice_01_art.svg        # Static/SMIL vector art slice
 │       ├── slice_02_header.svg     # Title, English subtitle, 3 umbrella icons
-│       ├── slice_03_social.svg     # Front-end credentials & social coordinates
-│       ├── slice_04_stats.svg      # Commits grid with circular side admission notches
-│       └── slice_05_note.svg       # Authentic cursive calligraphy & bottom teeth
+│       ├── slice_03_portfolio.svg  # Dedicated Portfólio strip & visit indicator
+│       ├── slice_04_linkedin.svg   # Big bold LinkedIn & connect ticket stamp
+│       ├── slice_05_stats.svg      # Commits grid with circular side admission notches
+│       └── slice_06_note.svg       # Authentic cursive calligraphy & bottom teeth
 ├── scripts/
 │   └── generate_ticket.py          # Master generator, compositor, and GIF compiler
 ├── .github/
